@@ -1,24 +1,31 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_mobx/flutter_mobx.dart';
+import 'package:provider/provider.dart';
 
 import '../../data/_data.dart';
+import '../../states/_states.dart';
 import '../../ui_kit/_ui_kit.dart';
 import '../_ui.dart';
 
 class FavoriteScreen extends StatelessWidget {
-  FavoriteScreen({super.key});
-  var favoriteItems = AppData.favoriteItems;
+  const FavoriteScreen({super.key});
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: _appBar(context),
-      body: EmptyWrapper(
-        type: EmptyWrapperType.favorite,
-        title: "Empty favorite",
-        isEmpty: favoriteItems.isEmpty,
-        child: _favoriteListView(context),
-      ),
-    );
+    final state = Provider.of<StickerStore>(context, listen: false);
+    return Observer(builder: (_) {
+      final favoriteItems = state.favorite.toList();
+      // Шаг 12: управление пустым экраном
+      return Scaffold(
+        appBar: _appBar(context),
+        body: EmptyWrapper(
+          type: EmptyWrapperType.favorite,
+          title: "Empty favorite",
+          isEmpty: favoriteItems.isEmpty,
+          child: _favoriteListView(context, favoriteItems),
+        ),
+      );
+    });
   }
 
   PreferredSizeWidget _appBar(BuildContext context) {
@@ -30,7 +37,7 @@ class FavoriteScreen extends StatelessWidget {
     );
   }
 
-  Widget _favoriteListView(BuildContext context) {
+  Widget _favoriteListView(BuildContext context, List<Sticker> favoriteItems) {
     return ListView.separated(
       padding: const EdgeInsets.all(30),
       itemCount: favoriteItems.length,

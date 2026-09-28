@@ -1,26 +1,32 @@
 import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
+import 'package:flutter_mobx/flutter_mobx.dart';
+import 'package:provider/provider.dart';
 
 import '../../data/_data.dart';
+import '../../states/_states.dart';
 import '../../ui_kit/_ui_kit.dart';
 import '../_ui.dart';
 
 class CartScreen extends StatelessWidget {
-  CartScreen({super.key});
-  var cartItems = AppData.cartItems;
-  double taxes = 5.0;
+  const CartScreen({super.key});
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: _appBar(context),
-      body: EmptyWrapper(
-        title: "Empty cart",
-        isEmpty: cartItems.isEmpty,
-        child: _cartListView(context),
-      ),
-      bottomNavigationBar: cartItems.isEmpty? const SizedBox.shrink() : _bottomAppBar(context),
-    );
+    final state = Provider.of<StickerStore>(context, listen: false);
+    return Observer(builder: (_) {
+      final cartItems = state.cart.toList();
+      // Шаг 5: управление пустой корзиной
+      return Scaffold(
+        appBar: _appBar(context),
+        body: EmptyWrapper(
+          title: "Empty cart",
+          isEmpty: cartItems.isEmpty,
+          child: _cartListView(context, state, cartItems),
+        ),
+        bottomNavigationBar: cartItems.isEmpty ? const SizedBox.shrink() : _bottomAppBar(context, state),
+      );
+    });
   }
 
   PreferredSizeWidget _appBar(BuildContext context) {
@@ -32,7 +38,8 @@ class CartScreen extends StatelessWidget {
     );
   }
 
-  Widget _cartListView(BuildContext context) {
+  // Шаг 7: список в корзине
+  Widget _cartListView(BuildContext context, StickerStore state, List<Sticker> cartItems) {
     return ListView.separated(
       padding: const EdgeInsets.all(30),
       itemCount: cartItems.length,
@@ -40,12 +47,13 @@ class CartScreen extends StatelessWidget {
         final sticker = cartItems[index];
         return Dismissible(
           direction: DismissDirection.endToStart,
+          // Шаг 10: удаление из корзины
           onDismissed: (direction) {
             if (direction == DismissDirection.endToStart) {
-              print('Удаляем');
+              state.onRemoveFromCartTap(sticker);
             }
           },
-          key: UniqueKey(),
+          key: ValueKey(sticker.id),
           background: Row(
             children: [
               Container(
@@ -91,13 +99,10 @@ class CartScreen extends StatelessWidget {
                 const Spacer(),
                 Column(
                   children: [
+                    // Шаг 9: количество в корзине
                     CounterButton(
-                      onIncrementTap: () {
-                        print('Увеличить количество');
-                      },
-                      onDecrementTap: () {
-                        print('Уменьшить количество');
-                      },
+                      onIncrementTap: () => state.onIncreaseQuantityTap(sticker),
+                      onDecrementTap: () => state.onDecreaseQuantityTap(sticker),
                       size: const Size(24, 24),
                       padding: 0,
                       label: Text(
@@ -106,7 +111,7 @@ class CartScreen extends StatelessWidget {
                       ),
                     ),
                     Text(
-                      "\$10",
+                      "\$${state.stickerPrice(sticker)}",
                       style: AppTextStyle.h2Style.copyWith(color: AppColor.accent),
                     )
                   ],
@@ -122,7 +127,8 @@ class CartScreen extends StatelessWidget {
     );
   }
 
-  Widget _bottomAppBar(BuildContext context) {
+  // Шаг 8: стоимость корзины
+  Widget _bottomAppBar(BuildContext context, StickerStore state) {
     return ClipRRect(
       borderRadius: const BorderRadius.only(
         topLeft: Radius.circular(30),
@@ -148,7 +154,7 @@ class CartScreen extends StatelessWidget {
                                 style: Theme.of(context).textTheme.headlineSmall,
                               ),
                               Text(
-                                "\$111",
+                                "\$${state.subtotal}",
                                 style: Theme.of(context).textTheme.displayMedium,
                               ),
                             ],
@@ -165,7 +171,7 @@ class CartScreen extends StatelessWidget {
                                 style: Theme.of(context).textTheme.headlineSmall,
                               ),
                               Text(
-                                "\$${taxes}",
+                                "\$${state.taxes}",
                                 style: Theme.of(context).textTheme.displayMedium,
                               ),
                             ],
@@ -185,7 +191,7 @@ class CartScreen extends StatelessWidget {
                                 style: Theme.of(context).textTheme.displayMedium,
                               ),
                               Text(
-                                "\$120.0",
+                                "\$${state.total}",
                                 style: AppTextStyle.h2Style.copyWith(
                                   color: AppColor.accent,
                                 ),
@@ -199,8 +205,9 @@ class CartScreen extends StatelessWidget {
                           height: 45,
                           child: Padding(
                             padding: const EdgeInsets.symmetric(horizontal: 30),
+                            // Шаг 11: чистка корзины на checkout
                             child: ElevatedButton(
-                              onPressed: () {},
+                              onPressed: () => state.onCheckOutTap(),
                               child: const Text("Checkout"),
                             ),
                           ),
