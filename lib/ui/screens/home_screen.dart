@@ -11,7 +11,7 @@ class HomeScreen extends StatefulWidget {
 }
 
 class HomeScreenState extends State<HomeScreen> {
-  final List<Widget> screens = [StickerList(), CartScreen(), FavoriteScreen(), const ProfileScreen()];
+  final List<Widget> screens = const [StickerList(), CartScreen(), FavoriteScreen(), ProfileScreen()];
   int currentIndex = 0;
 
   void onTabTap(int index) {
