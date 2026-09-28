@@ -1,24 +1,35 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_rating_bar/flutter_rating_bar.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
+import 'package:flutter_redux/flutter_redux.dart';
 
 import '../../data/_data.dart';
+import '../../states/_states.dart';
 import '../../ui_kit/_ui_kit.dart';
 import '../widgets/_widgets.dart';
 
 class StickerDetail extends StatelessWidget {
-  StickerDetail({super.key});
-  final sticker = AppData.stickers[0];
+  const StickerDetail({super.key, required this.stickerId});
+
+  // Шаг 3: экран получает id выбранного продукта
+  final int stickerId;
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: _appBar(context),
-      body: Center(child: Image.asset(sticker.image, scale: 2)),
-      floatingActionButton: _floatingActionButton(),
-      floatingActionButtonLocation: FloatingActionButtonLocation.endDocked,
-      bottomNavigationBar: _bottomAppBar(context),
-    );
+    return StoreConnector<StickerState, StickerState>(
+      distinct: true,
+      converter: (store) => store.state,
+      builder: (context, state) {
+      // актуальная версия стикера берётся из состояния по id
+      final sticker = state.getStickerById(stickerId);
+      return Scaffold(
+        appBar: _appBar(context),
+        body: Center(child: Image.asset(sticker.image, scale: 2)),
+        floatingActionButton: _floatingActionButton(context, sticker),
+        floatingActionButtonLocation: FloatingActionButtonLocation.endDocked,
+        bottomNavigationBar: _bottomAppBar(context, sticker),
+      );
+    });
   }
 
   PreferredSizeWidget _appBar(BuildContext context) {
@@ -35,16 +46,17 @@ class StickerDetail extends StatelessWidget {
     );
   }
 
-  Widget _floatingActionButton() {
+  // Шаг 13: добавление/удаление из избранного
+  Widget _floatingActionButton(BuildContext context, Sticker sticker) {
     return FloatingActionButton(
       elevation: 0.0,
       backgroundColor: AppColor.accent,
-      onPressed: () {},
+      onPressed: () => StoreProvider.of<StickerState>(context).dispatch(FavoriteToggledAction(sticker.id)),
       child: sticker.favorite ? const Icon(AppIcon.heart) : const Icon(AppIcon.outlinedHeart),
     );
   }
 
-  Widget _bottomAppBar(BuildContext context) {
+  Widget _bottomAppBar(BuildContext context, Sticker sticker) {
     return ClipRRect(
         borderRadius: const BorderRadius.only(
           topLeft: Radius.circular(30),
@@ -76,9 +88,7 @@ class StickerDetail extends StatelessWidget {
                                   FontAwesomeIcons.solidStar,
                                   color: AppColor.yellow,
                                 ),
-                                onRatingUpdate: (rating) {
-                                  print('$rating');
-                                },
+                                onRatingUpdate: (rating) {},
                               ),
                               const SizedBox(width: 15),
                               Text(
@@ -100,9 +110,10 @@ class StickerDetail extends StatelessWidget {
                                 "\$${sticker.price}",
                                 style: Theme.of(context).textTheme.displayLarge?.copyWith(color: AppColor.accent),
                               ),
+                              // Шаг 4: количество
                               CounterButton(
-                                onIncrementTap: () {},
-                                onDecrementTap: () {},
+                                onIncrementTap: () => StoreProvider.of<StickerState>(context).dispatch(QuantityIncreasedAction(sticker.id)),
+                                onDecrementTap: () => StoreProvider.of<StickerState>(context).dispatch(QuantityDecreasedAction(sticker.id)),
                                 label: Text(
                                   sticker.quantity.toString(),
                                   style: Theme.of(context).textTheme.displayLarge,
@@ -126,9 +137,10 @@ class StickerDetail extends StatelessWidget {
                             height: 45,
                             child: Padding(
                               padding: const EdgeInsets.symmetric(horizontal: 30),
+                              // Шаг 6: добавление в корзину
                               child: ElevatedButton(
-                                onPressed: () {},
-                                child: const Text("Add to cart"),
+                                onPressed: sticker.cart ? null : () => StoreProvider.of<StickerState>(context).dispatch(AddedToCartAction(sticker.id)),
+                                child: Text(sticker.cart ? "In cart" : "Add to cart"),
                               ),
                             ),
                           )
