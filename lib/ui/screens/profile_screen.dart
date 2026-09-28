@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
+import 'package:get/get.dart';
 
+import '../../states/_states.dart';
 import '../../ui_kit/_ui_kit.dart';
 
 class ProfileScreen extends StatelessWidget {
@@ -7,6 +9,7 @@ class ProfileScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final state = Get.find<StickerState>();
     return Scaffold(
       body: Column(
         mainAxisAlignment: MainAxisAlignment.center,
@@ -18,6 +21,22 @@ class ProfileScreen extends StatelessWidget {
           Text(
             "Hello Sunny!",
             style: Theme.of(context).textTheme.displayLarge,
+          ),
+          const SizedBox(height: 20),
+          // Шаг 14: смена темы
+          Obx(
+            () => Row(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                Text("Dark theme", style: Theme.of(context).textTheme.headlineMedium),
+                const SizedBox(width: 10),
+                Switch(
+                  activeColor: AppColor.accent,
+                  value: !state.light.value,
+                  onChanged: (_) => state.toggleTheme(),
+                ),
+              ],
+            ),
           ),
         ],
       ),
