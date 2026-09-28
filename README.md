@@ -1,3 +1,29 @@
+# Стикеры: бизнес-логика на MobX
+
+**Выполнил:** Ромашкан Данил Алексеевич, группа М-И-25
+**Дисциплина:** Современные платформы программирования
+
+Ветка `mobx` — реализация 14 шагов бизнес-логики учебного проекта SunStickers с помощью **MobX**.
+Основа — ветка `state_structure_stateless` исходного репозитория [yulmosk/SunStickers](https://github.com/yulmosk/SunStickers).
+
+- Пакеты: mobx, flutter_mobx, provider
+- Файлы логики: `lib/states/sticker_store.dart`
+- Подход: `StickerStore` с `ObservableList` и `Observable<bool>` (без кодогенерации), изменения в `runInAction`, подписка UI через `Observer`, внедрение стора через `Provider`.
+
+Реализованные шаги: 1. Подсветка выбранной категории · 2. Продукты по категории · 3. Детали: отображение продукта ·
+4. Детали: количество · 5. Корзина: пустая корзина · 6. Детали: добавление в корзину · 7. Корзина: список ·
+8. Корзина: стоимость (Subtotal / Taxes / Total) · 9. Корзина: количество · 10. Корзина: удаление (свайп влево) ·
+11. Корзина: очистка на Checkout · 12. Избранное: пустой экран · 13. Детали: добавить/убрать из избранного ·
+14. Смена темы (переключатель на экране Profile).
+
+Запуск:
+```
+flutter pub get
+flutter run -d chrome
+```
+
+---
+
 ## Ветка :star: state_structure_stateless
 
 Для упрощения перехода от логики на основе setState ([Учебник](https://yulmosk.github.io/SunStickers/tutorials/Stickers.pdf) Глава 8) к использованию  библиотек, в ветке state_structure_stateless виджеты экранов преобразованы со StatefulWidget на StatelessWidget.
