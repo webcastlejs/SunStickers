@@ -1,3 +1,29 @@
+# Стикеры: бизнес-логика на Redux
+
+**Выполнил:** Ромашкан Данил Алексеевич, группа М-И-25
+**Дисциплина:** Современные платформы программирования
+
+Ветка `redux` — реализация 14 шагов бизнес-логики учебного проекта SunStickers с помощью **Redux**.
+Основа — ветка `state_structure_copy_with` исходного репозитория [yulmosk/SunStickers](https://github.com/yulmosk/SunStickers).
+
+- Пакеты: redux, flutter_redux, equatable
+- Файлы логики: `lib/states/sticker_actions.dart`, `lib/states/sticker_reducer.dart`, `lib/states/sticker_state.dart`
+- Подход: классы действий `*Action`, чистая функция `stickerReducer`, `Store` + `StoreProvider`, чтение через `StoreConnector`, отправка через `dispatch`.
+
+Реализованные шаги: 1. Подсветка выбранной категории · 2. Продукты по категории · 3. Детали: отображение продукта ·
+4. Детали: количество · 5. Корзина: пустая корзина · 6. Детали: добавление в корзину · 7. Корзина: список ·
+8. Корзина: стоимость (Subtotal / Taxes / Total) · 9. Корзина: количество · 10. Корзина: удаление (свайп влево) ·
+11. Корзина: очистка на Checkout · 12. Избранное: пустой экран · 13. Детали: добавить/убрать из избранного ·
+14. Смена темы (переключатель на экране Profile).
+
+Запуск:
+```
+flutter pub get
+flutter run -d chrome
+```
+
+---
+
 ## Ветка :star: state_structure_copy_with
 
 В ветке state_structure_stateless как и в ветке state_structure_stateless виджеты экранов преобразованы со StatefulWidget на StatelessWidget.
